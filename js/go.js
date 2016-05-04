@@ -1,1 +1,87 @@
-eval(function(p,a,c,k,e,d){e=function(c){return(c<a?"":e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)d[e(c)]=k[c]||e(c);k=[function(e){return d[e]}];e=function(){return'\\w+'};c=1;};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p;}('f 4={h:"1n",j:6,k:6,l:6,9:6,5:6,12:7(){f 5=3.G("5")d(5!=6&&5.1c>10){$.15("M.t?c=17&a=16&5="+5,7(m){d(m.O==0){4.5=5 4.j=m.r.j 4.k=m.r.k 4.l=m.r.l 4.9=m.r.9 4.n("5",4.5)4.n("j",4.j)4.n("k",4.k)4.n("l",4.l)4.n("9",4.9)}p{4.u()}},"13")}p{4.u()}},1b:7(){d(3.5==6){3.5=3.8("5")3.j=3.8("j")3.k=3.8("k")3.l=3.8("l")3.9=3.8("9")}},n:7(a,b){d(e.o){e.o.U(3.h+a,b)}p{f c=s B;c.A(c.H()+V),y.x=3.h+a+"="+S(b)+";I="+c.F()}},8:7(a){d(e.o){q e.o.W(3.h+a)}p{f b=y.x.D(s z("(^| )"+3.h+a+"=([^;]*)(;|$)"));q 6!=b?C(b[2]):6}},Z:7(a){d(e.o){e.o.11(3.h+a)}p{f b,c;b=s B b.A(b.H()-1)c=3.8(a)d(6!=c){y.x=3.h+a+"="+c+";I="+b.F()}}},1m:7(a,b,c){f E="Q://g.J.w/1f.t?1g="+a+"&1d="+b+"&1e="+c;1h.v.K=E},G:7(a){f b=s z("(^|&)"+a+"=([^&]*)(&|$)","i"),c=e.v.1l.1i(1).D(b);q 6!=c?C(c[2]):6},R:\'1j\',N:\'Q://g.J.w/M.t?c=1k&a=1u\',L:7(){q\'1t://1s.P.1v.w/1r/1o/1q?1p=\'+3.R+\'&Y=\'+X(3.N)+\'&T=O&19=18&1a=P#14\'},u:7(){v.K=3.L()}}',62,94,'|||this|GO|token|null|function|get|face||||if|window|var||_0||name|city|province|data|set|localStorage|else|return|res|new|php|weixinLogin|location|com|cookie|document|RegExp|setTime|Date|unescape|match|url|toGMTString|getURLVar|getTime|expires|ibingyi|href|weixinUrl|api|loginUrl|code|weixin|http|wxAppId|escape|response_type|setItem|31536e6|getItem|encodeURIComponent|redirect_uri|remove||removeItem|init|json|wechat_redirect|post|getUserInfo|user|snsapi_userinfo|scope|state|refresh|length|productId|extra|shop|appId|top|substr|wxc03adecc28213ae1|plat|search|goToPay|by_|oauth2|appid|authorize|connect|open|https|login|qq'.split('|'),0,{}))
+var GO = {
+    _pre: "by_",
+    name: null,
+    city: null,
+    province: null,
+    face: null,
+    token: null,
+    init: function() {
+        var token = this.getURLVar("token")
+        if (token != null && token.length > 10) {
+            $.post("api.php?c=user&a=getUserInfo&token=" + token, function(data) {
+                if (data.code == 0) {
+                    GO.token = token
+                    GO.name = data.res.name
+                    GO.city = data.res.city
+                    GO.province = data.res.province
+                    GO.face = data.res.face
+                    GO.set("token", GO.token)
+                    GO.set("name", GO.name)
+                    GO.set("city", GO.city)
+                    GO.set("province", GO.province)
+                    GO.set("face", GO.face)
+                } else {
+                    GO.weixinLogin();
+                }
+            }, "json")
+        } else {
+            GO.weixinLogin();
+        }
+    },
+    refresh: function() {
+
+        if (this.token == null) {
+            this.token = this.get("token")
+            this.name = this.get("name")
+            this.city = this.get("city")
+            this.province = this.get("province")
+            this.face = this.get("face")
+        }
+    },
+    set: function(a, b) {
+        if (window.localStorage) {
+            window.localStorage.setItem(this._pre + a, b);
+        } else {
+            var c = new Date;
+            c.setTime(c.getTime() + 31536e6), document.cookie = this._pre + a + "=" + escape(b) + ";expires=" + c.toGMTString()
+        }
+    },
+    get: function(a) {
+        if (window.localStorage) {
+            return window.localStorage.getItem(this._pre + a);
+        } else {
+            var b = document.cookie.match(new RegExp("(^| )" + this._pre + a + "=([^;]*)(;|$)"));
+            return null != b ? unescape(b[2]) : null
+        }
+    },
+    remove: function(a) {
+        if (window.localStorage) {
+            window.localStorage.removeItem(this._pre + a)
+        } else {
+            var b, c;
+            b = new Date
+            b.setTime(b.getTime() - 1)
+            c = this.get(a)
+            if (null != c) {
+                document.cookie = this._pre + a + "=" + c + ";expires=" + b.toGMTString()
+            }
+        }
+    },
+    goToPay: function(a, b, c) {
+        var url = "http://g.ibingyi.com/shop.php?appId=" + a + "&productId=" + b + "&extra=" + c;
+        top.location.href = url
+    },
+    getURLVar: function(a) {
+        var b = new RegExp("(^|&)" + a + "=([^&]*)(&|$)", "i"),
+            c = window.location.search.substr(1).match(b);
+        return null != c ? unescape(c[2]) : null
+    },
+    wxAppId: 'wxc03adecc28213ae1',
+    loginUrl: 'http://g.ibingyi.com/api.php?c=plat&a=login',
+    weixinUrl: function() {
+        return 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + this.wxAppId + '&redirect_uri=' + encodeURIComponent(this.loginUrl) + '&response_type=code&scope=snsapi_userinfo&state=weixin#wechat_redirect'
+    },
+    weixinLogin: function() {
+        location.href = this.weixinUrl()
+    }
+}
