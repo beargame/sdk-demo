@@ -118,5 +118,4 @@ class BearOpen {
 		}
 		return implode("&", $arr);
 	}
-
 }
