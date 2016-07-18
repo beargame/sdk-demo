@@ -1,68 +1,83 @@
 <?php
+$appId = YOU_APP_ID;
+$appSecret = YOU_APP_SECRET;
+
 $open = new BearOpen();
-$open->secret = "b3ad67fa6b25d435d4dd12896005428f";
-// $accessToken = "sasd1213123";
-// $open->UserInfo($accessToken); //获取用户信息
-$open->SetGameUrl("http://g.ibingyi.com/ext.html"); //设置游戏地址
-$open->SetNotifyUrl("http://g.ibingyi.com/back.php"); //设置支付回调地址
-$json = '[{"id":1001,"price":100,"name":"10元宝","desc":"10元宝"},{"id":1002,"price":200,"name":"20元宝","desc":"20元宝"}]'; //设置支付套餐
+$open->appId = $appId;
+$open->secret = $appSecret;
+
+//获取用户信息
+$accessToken = YOUR_APP_ACCESS_TOKEN;
+$open->UserInfo($accessToken);
+
+//设置游戏地址
+$open->SetGameUrl(YOU_GAME_URL);
+
+//设置支付回调地址
+$open->SetNotifyUrl(YOU_NOTIFY_URL);
+
+//设置支付套餐 price 单位 分
+$json = '[{"id":1001,"price":100,"name":"10元宝","desc":"10元宝"},{"id":1002,"price":200,"name":"20元宝","desc":"20元宝"}]';
 $open->SetProduct($json);
-$openId = "7da288c4449afddda7862d6f684a05e3";
-$open->AddWhite($openId); //添加支付白名单ID
+
+//添加支付白名单ID
+$openId = YOUR_OPEN_ID;
+$open->AddWhite($openId);
 
 class BearOpen {
+	public $appId;
 	public $secret;
 
 	public function UserInfo($accessToken) {
-		$url = "http://g.ibingyi.com/open/UserInfo?accessToken=" . $accessToken;
+		$url = "http://open.ibeargame.com/UserInfo?accessToken=" . $accessToken;
 		$this->httpRequest($url, "get", array());
 	}
 
 	public function SetProduct($json) {
 		$params = array(
-			'appId' => 1,
+			'appId' => $this->appId,
 			'data' => $json,
 		);
 
 		$sign = $this->makeSign($params);
 		$params['sign'] = $sign;
-		$url = "http://g.ibingyi.com/open/setProduct";
+		$url = "http://open.ibeargame.com/SetProduct";
 		$this->httpRequest($url, "post", $params);
 	}
 
 	public function AddWhite($openId) {
 		$params = array(
-			'appId' => 1,
+			'appId' => $this->appId,
 			'data' => $openId,
 		);
 
 		$sign = $this->makeSign($params);
 		$params['sign'] = $sign;
-		$url = "http://g.ibingyi.com/open/AddWhite";
+		$url = "http://open.ibeargame.com/AddWhite";
 		$this->httpRequest($url, "post", $params);
 	}
 
 	public function SetNotifyUrl($url) {
 		$params = array(
-			'appId' => 1,
+			'appId' => $this->appId,
 			'data' => $url,
 		);
 
 		$sign = $this->makeSign($params);
 		$params['sign'] = $sign;
-		$url = "http://g.ibingyi.com/open/SetNotifyUrl";
+		$url = "http://open.ibeargame.com/SetNotifyUrl";
 		$this->httpRequest($url, "post", $params);
 	}
 
 	public function SetGameUrl($gameUrl) {
 		$params = array(
-			'appId' => 1,
+			'appId' => $this->appId,
 			'data' => $gameUrl,
 		);
 
 		$sign = $this->makeSign($params);
 		$params['sign'] = $sign;
-		$url = "http://g.ibingyi.com/open/SetGameUrl";
+		$url = "http://open.ibeargame.com/SetGameUrl";
 		$this->httpRequest($url, "post", $params);
 	}
 
@@ -92,7 +107,16 @@ class BearOpen {
 
 	private function makeSign($params) {
 		ksort($params);
-		$sign = md5(http_build_query($params) . $this->secret);
+		$sign = md5($this->build_query($params) . $this->secret);
 		return $sign;
 	}
+
+	private function build_query($params) {
+		$arr = array();
+		foreach ($params as $key => $value) {
+			$arr[] = $key . '=' . $value;
+		}
+		return implode("&", $arr);
+	}
+
 }
